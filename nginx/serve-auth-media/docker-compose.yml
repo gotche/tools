@@ -1,0 +1,33 @@
+version: '2'
+services:
+  app:
+    image: app2
+    container_name: app2
+    environment: 
+      - FLASK_APP=wsgi.py
+      - FLASK_DEBUG=1
+    ports:
+      - 5000:5000
+    volumes: 
+      - ./app:/app
+    depends_on:
+      - mediaserver
+  webserver:
+    image: nginx
+    container_name: nginx-webserver
+    volumes:
+      - ./webserver/conf.d:/etc/nginx/conf.d
+    ports:
+      - 80:80
+    depends_on:
+      - app
+      - mediaserver
+  mediaserver:
+    image: nginx
+    container_name: nginx-mediaserver
+    volumes:
+      - ./mediaserver/conf.d:/etc/nginx/conf.d
+      - ./mediaserver:/usr/share/nginx/html:ro
+      - ./mediaserver/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - 6000:80
